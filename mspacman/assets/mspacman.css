@@ -1,0 +1,15 @@
+#game {
+height: 136px;
+width: 464px;
+	background: url(pacman10-hp-sprite.png) -322px 2px;
+}
+
+#mspacman {
+	height: 14px;
+	width: 14px;
+	background: url(pacman10-hp-sprite.png) -82px, 22px;
+}
+
+#sprites {
+	display:none;
+}
