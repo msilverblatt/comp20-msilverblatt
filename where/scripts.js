@@ -205,7 +205,9 @@ function showStations(){
 		myContent += "<h3>Your closest station is " + data[closestIndex].StationName + ", only " + closestDistance + " miles away!</h3>";
 		infowindow.setContent(myContent);
 	}
-	else alert("nothin");
+	else {
+		myContent += "<h3>You are not near any Red Line stations</h3>";
+	}
 
 	for (var m in markers){
 		markers[m].setMap(map);
