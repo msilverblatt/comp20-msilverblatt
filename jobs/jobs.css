@@ -1,0 +1,15 @@
+.description {
+    background-color: #FFFF73;
+    border-radius: 10px;
+    display: none;
+    opacity: 0.9;
+    padding: 10px;
+    z-index: 100;
+}
+
+.company:hover + .description{
+text-align: center;
+
+display: inline;
+
+}

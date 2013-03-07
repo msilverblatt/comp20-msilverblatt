@@ -9,6 +9,7 @@ var ashmontBranch = [];
 var myLoc;
 var loc;
 var tIcon = "assets/icon.png";
+var myContent = "<h1>You are here!</h1>";
 
 
 var infowindow = new google.maps.InfoWindow();
@@ -49,7 +50,7 @@ function updateMap(){
 	});
 	marker.setMap(map);
 					// Open info window on click of marker
-	infowindow.setContent("<h1>You are here</h1>");
+	infowindow.setContent(myContent);
 	infowindow.open(map, marker);
 	map.panTo(myLoc);
 }
@@ -62,10 +63,16 @@ function showStations(){
 	closestDistance = 99999999;
 	for (i = 0, len = data.length; i < len; i++){
 
-		console.log(data[i].StationName);
+		//console.log(data[i].StationName);
 		loc = new google.maps.LatLng(data[i].stop_lat,data[i].stop_lon);
-		if (myDistance(loc) < closestDistance) closestIndex = i;
-		console.log(myDistance(loc));
+		distance = myDistance(loc);
+		if (distance < closestDistance) {
+			closestIndex = i;
+			closestDistance = distance;
+		}
+
+
+		//console.log(myDistance(loc));
 		markers.push(new google.maps.Marker({
 			position: loc,
 			title: data[i].StationName,
@@ -96,7 +103,10 @@ function showStations(){
 			//console.log("incrementing i");
 		}	
 	}
-	if (closestIndex >= 0) alert(data[closestIndex].StationName);
+	if (closestIndex >= 0) {
+		myContent += "<h3>Your closest station is " + data[closestIndex].StationName + "</h3>";
+		infowindow.setContent(myContent);
+	}
 	else alert("nothin");
 
 	for (var m in markers){
@@ -154,6 +164,7 @@ var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                 Math.sin(dLon/2) * Math.sin(dLon/2);  
 var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
 var d = R * c; 	
+return d;
 }
 
 function toRad(x) {
