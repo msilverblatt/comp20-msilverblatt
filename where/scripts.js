@@ -2,6 +2,8 @@ var myLat = 0;
 var myLong = 0;
 var map;
 var marker;
+var markers = [];
+var redStations = [];
 var loc;
 
 
@@ -10,7 +12,7 @@ var stations = '[{"Line":"Red","PlatformKey":"RALEN","PlatformName":"ALEWIFE NB"
 
 
 function init(){
-	loc = new google.maps.LatLng(0, -71.0567528);
+	loc = new google.maps.LatLng(42.330497742, -71.095794678);
 	options = {
 		zoom: 13,
 		center: loc,
@@ -54,15 +56,22 @@ function showStations(){
 	for (i = 0, len = data.length; i < len; i++){
 		console.log(data[i].StationName);
 		loc = new google.maps.LatLng(data[i].stop_lat,data[i].stop_lon);
-		marker = new google.maps.Marker({
+		markers.push(new google.maps.Marker({
 			position: loc,
 			title: data[i].StationName
-		})
-		marker.setMap(map);
-		google.maps.event.addListener(marker, 'click', function() {
-			infowindow.setContent(marker.title);
-			infowindow.open(map, marker);
-	});
+		}));
+		redStations.push(loc);
+		
+	}
+	
+	for (var m in markers){
+		markers[m].setMap(map);
+
+		google.maps.event.addListener(markers[m], 'click', function() {
+			obj = this;
+			thisTitle = this.title;
+			infowindow.setContent(thisTitle);
+			infowindow.open(map, obj);
+		});
 	}
 }
-
