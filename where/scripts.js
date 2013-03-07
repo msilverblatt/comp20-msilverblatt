@@ -4,7 +4,11 @@ var map;
 var marker;
 var markers = [];
 var redStations = [];
+var braintreeBranch = [];
+var ashmontBranch = [];
+var myLoc;
 var loc;
+var tIcon = "assets/icon.png";
 
 
 var infowindow = new google.maps.InfoWindow();
@@ -14,13 +18,13 @@ var stations = '[{"Line":"Red","PlatformKey":"RALEN","PlatformName":"ALEWIFE NB"
 function init(){
 	loc = new google.maps.LatLng(42.330497742, -71.095794678);
 	options = {
-		zoom: 13,
+		zoom: 11,
 		center: loc,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById("map_div"), options);
 	findMe();
-	showStations();
+//	showStations();
 }
 
 function findMe(){
@@ -29,6 +33,7 @@ function findMe(){
 			myLat = position.coords.latitude;
 			myLong = position.coords.longitude;
 			updateMap();
+			showStations();
 		});
 	}
 	else {
@@ -37,41 +42,120 @@ function findMe(){
 }
 
 function updateMap(){
-	loc = new google.maps.LatLng(myLat,myLong);
+	myLoc = new google.maps.LatLng(myLat,myLong);
 	marker = new google.maps.Marker({
-		position: loc,
+		position: myLoc,
 		title: "myLoc"
 	});
 	marker.setMap(map);
 					// Open info window on click of marker
-	google.maps.event.addListener(marker, 'click', function() {
-		infowindow.setContent(marker.title);
-		infowindow.open(map, marker);
-	});
-	map.panTo(loc);
+	infowindow.setContent("<h1>You are here</h1>");
+	infowindow.open(map, marker);
+	map.panTo(myLoc);
 }
 
 function showStations(){
+	pastBranch = false;
+	pastAshmont = false;
 	data = JSON.parse(stations);
+	closestIndex = -1;
+	closestDistance = 99999999;
 	for (i = 0, len = data.length; i < len; i++){
+
 		console.log(data[i].StationName);
 		loc = new google.maps.LatLng(data[i].stop_lat,data[i].stop_lon);
+		if (myDistance(loc) < closestDistance) closestIndex = i;
+		console.log(myDistance(loc));
 		markers.push(new google.maps.Marker({
 			position: loc,
-			title: data[i].StationName
+			title: data[i].StationName,
+			icon: tIcon
 		}));
-		redStations.push(loc);
+
+		if (data[i].StationName == "JFK"){
+			pastBranch = true;
+			ashmontBranch.push(loc);
+			braintreeBranch.push(loc);
+			redStations.push(loc);
+		}
+		else if (!pastBranch) redStations.push(loc);
 		
+		else if (data[i].StationName == "ASHMONT"){
+				ashmontBranch.push(loc);
+				pastAshmont = true;
+		}
+		else if (!pastAshmont){
+				ashmontBranch.push(loc);
+		}
+		else braintreeBranch.push(loc);
+
+
+		
+		if (data[i].EndOfLine == "FALSE") {
+			i++;
+			//console.log("incrementing i");
+		}	
 	}
-	
+	if (closestIndex >= 0) alert(data[closestIndex].StationName);
+	else alert("nothin");
+
 	for (var m in markers){
 		markers[m].setMap(map);
 
 		google.maps.event.addListener(markers[m], 'click', function() {
 			obj = this;
-			thisTitle = this.title;
+			thisTitle = "<strong>" + this.title + "</strong>";
 			infowindow.setContent(thisTitle);
 			infowindow.open(map, obj);
 		});
 	}
+	drawLine();
+}
+
+function drawLine(){
+
+	redLine = new google.maps.Polyline({
+			path: redStations,
+			strokeColor: "#FF0000",
+			strokeOpacity: 1.0,
+			strokeWeight: 10
+		});
+	redLine.setMap(map);
+	aBranch = new google.maps.Polyline({
+		path: ashmontBranch,
+		strokeColor: "#FF0000",
+		strokeOpacity: 1.0,
+		strokeWeight: 10
+	});
+	aBranch.setMap(map);
+	bBranch = new google.maps.Polyline({
+		path: braintreeBranch,
+		strokeColor: "#FF0000",
+		strokeOpacity: 1.0,
+		strokeWeight: 10
+	});
+	bBranch.setMap(map);
+}
+
+function myDistance(other){
+var lat2 = myLat; 
+var lon2 = myLong; 
+var lat1 = other.lat(); 
+var lon1 = other.lng(); 
+console.log("myLat: " + myLat);
+
+var R = 6371; // km 
+
+var dLat = toRad(lat2 - lat1);  
+
+var dLon = toRad(lon2 - lon1);  
+var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);  
+var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+var d = R * c; 	
+}
+
+function toRad(x) {
+   return x * Math.PI / 180;
 }
