@@ -2,25 +2,105 @@
 sprite = new Image();
 sprite.src = "assets/frogger_sprites.png";
 
+var lives = 5;
+
+var frog_xcor;
+var frog_ycor;
+
+var whitecar_xcor;
+var whitecar_ycor;
+
+var yellowcar_xcor;
+var yellowcar_ycor;
+
+var otherwhite_xcor;
+var otherwhite_ycor;
+
+var truck_xcor;
+var truck_ycor;
+
+var log1_xcor;
+var log1_ycor;
+
+var log2_xcor;
+var log2_ycor;
+
+var xcors = [];
+var ycors = [];
+
+
+
+var canvas;// = document.getElementById("game");
+var ctx;// = canvas.getContext('2d');
 
 function init_setup(){
-canvas = document.getElementById("game");
-ctx = canvas.getContext('2d');	
+	canvas = document.getElementById("game");
+	ctx = canvas.getContext('2d');	
+	document.addEventListener("keydown", function(event) {
+    console.log(event.keyCode);
+    if (event.keyCode == 38) {
+    	event.preventDefault();
+      	console.log("I see that you pressed the up arrow!");
+      	ycors["frog"] -= 20;
+      	drawBoard();
+      	redraw();
+	//      	forward_crouched_frog(xcors["frog"],ycors["frog"]);
+    }
+  });
 //	sprite = new Image();
 //	sprite.src = "assets/frogger_sprites.png";
 	
-
-level = 1;
+	
+	level = 1;
 	highscore = 0;
 	score = 0;
 	lives = 3;
 
+
+	xcors["frog"] = canvas.width/2;
+	ycors["frog"] = 501;
+
+	xcors["white_car"] = 0;
+	ycors["white_car"] = 365;
+
+	xcors["purple"] = 0;
+	ycors["purple"] = 400;
+
+	xcors["truck"] = 0;
+	ycors["truck"] = 330;
+
+	xcors["yellow"] = 0;
+	ycors["yellow"] = 467;
+
+	xcors["other_white"] = 0;
+	ycors["other_white"] = 431;
+
+	xcors["log1"] = 250;
+	ycors["log1"] = 188;
+
+	xcors["log2"] = 50;
+	ycors["log2"] = 157;
+
+	xcors["log3"] = 200;
+	ycors["log3"] = 126;
+
+	xcors["log4"] = 0;
+	ycors["log4"] = 126;
+
+	xcors["log5"] = 150;
+	ycors["log5"] = 250;
+
 	drawBoard();
-	forward_crouched_frog(canvas.width/2,501);
+	redraw();
+}
+
+function redraw(){
+	drawBoard();
+	forward_crouched_frog(xcors["frog"],ycors["frog"]);
 	life_frog(lives);
 	setText();
-	white_car(0,365);
-	purp_car(0,400);
+	white_car(xcors["white_car"],ycors["white_car"]);
+	purp_car(xcors["purple"],ycors["purple"]);
 	truck(0,330);
 	yellow_car(0,467);
 	other_white(0,431);
@@ -29,7 +109,9 @@ level = 1;
 	med_log(200,126);
 	big_log(0,219);
 	small_log(150,250);
+
 }
+
 function drawBoard(){
 // Black road
 	ctx.fillRect(0,288,400,288);
