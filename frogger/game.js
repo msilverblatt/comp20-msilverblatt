@@ -2,33 +2,16 @@
 sprite = new Image();
 sprite.src = "assets/frogger_sprites.png";
 
-var lives = 5;
-
-var frog_xcor;
-var frog_ycor;
-
-var whitecar_xcor;
-var whitecar_ycor;
-
-var yellowcar_xcor;
-var yellowcar_ycor;
-
-var otherwhite_xcor;
-var otherwhite_ycor;
-
-var truck_xcor;
-var truck_ycor;
-
-var log1_xcor;
-var log1_ycor;
-
-var log2_xcor;
-var log2_ycor;
-
+var lives = 5; 
 var xcors = [];
 var ycors = [];
 
+var frog_dist = 25;
 
+var steps = 0;
+var maxSteps = 0;
+
+var newFrogs = 1;
 
 var canvas;// = document.getElementById("game");
 var ctx;// = canvas.getContext('2d');
@@ -37,16 +20,31 @@ function init_setup(){
 	canvas = document.getElementById("game");
 	ctx = canvas.getContext('2d');	
 	document.addEventListener("keydown", function(event) {
-    console.log(event.keyCode);
-    if (event.keyCode == 38) {
-    	event.preventDefault();
-      	console.log("I see that you pressed the up arrow!");
-      	ycors["frog"] -= 20;
-      	drawBoard();
-      	redraw();
-	//      	forward_crouched_frog(xcors["frog"],ycors["frog"]);
-    }
-  });
+    	console.log(event.keyCode);
+    	switch(event.keyCode){
+    		case 37:
+    			event.preventDefault();
+    			xcors["frog"] -= frog_dist;
+    			break;
+
+    		case 38:
+    			event.preventDefault();
+    			goForward();
+    			//ycors["frog"] -= frog_dist;
+    			break;
+    		case 39:
+    			event.preventDefault();
+    			xcors["frog"] += frog_dist;
+    			break;
+    		case 40:
+    			event.preventDefault();
+    			//ycors["frog"] += frog_dist;
+    			goBackward();
+   		 		break;
+    	}
+    	drawBoard();
+    	redraw();
+ 	});
 //	sprite = new Image();
 //	sprite.src = "assets/frogger_sprites.png";
 	
@@ -54,7 +52,7 @@ function init_setup(){
 	level = 1;
 	highscore = 0;
 	score = 0;
-	lives = 3;
+//	lives = 3;
 
 
 	xcors["frog"] = canvas.width/2;
@@ -94,9 +92,38 @@ function init_setup(){
 	redraw();
 }
 
+function goForward(){
+	ycors["frog"] -= frog_dist;
+	steps++;
+	if (steps > maxSteps){
+		maxSteps = steps;
+		score += 10;
+	}
+}
+
+function goBackward(){
+	ycors["frog"] += frog_dist;
+	steps--;
+}
+
+function goLeft(){
+
+}
+
+function goRight(){
+
+
+}
+
 function redraw(){
 	drawBoard();
 	forward_crouched_frog(xcors["frog"],ycors["frog"]);
+	if (score > (newFrogs * 10000)){
+		if(lives <= 4){
+			lives++;
+			newFrogs++;
+		}
+	}
 	life_frog(lives);
 	setText();
 	white_car(xcors["white_car"],ycors["white_car"]);
@@ -134,10 +161,11 @@ function drawBoard(){
 }
 
 function setText(){
+	if (score > highscore) highscore = score;
 	ctx.fillStyle="#00FF00";
 	ctx.font="20px Arial";
-	ctx.fillText("Level "+level, 50,545);
-ctx.font = "15px Arial";
+	ctx.fillText("Level "+level, 80,545);
+	ctx.font = "15px Arial";
 	ctx.fillText("Score: "+score,1,559);
 	ctx.fillText("Highscore: "+highscore, 81, 559);
 	
