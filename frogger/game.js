@@ -5,6 +5,7 @@ sprite.src = "assets/frogger_sprites.png";
 var lives = 5; 
 var xcors = [];
 var ycors = [];
+var speed = [];
 
 var frog_dist = 25;
 
@@ -16,10 +17,7 @@ var newFrogs = 1;
 var canvas;// = document.getElementById("game");
 var ctx;// = canvas.getContext('2d');
 
-function init_setup(){
-	canvas = document.getElementById("game");
-	ctx = canvas.getContext('2d');	
-	document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function(event) {
     	console.log(event.keyCode);
     	switch(event.keyCode){
     		case 37:
@@ -45,6 +43,11 @@ function init_setup(){
     	drawBoard();
     	redraw();
  	});
+
+function init_setup(){
+	canvas = document.getElementById("game");
+	ctx = canvas.getContext('2d');	
+	
 //	sprite = new Image();
 //	sprite.src = "assets/frogger_sprites.png";
 	
@@ -60,18 +63,23 @@ function init_setup(){
 
 	xcors["white_car"] = 0;
 	ycors["white_car"] = 365;
+	speed["white_car"] = 20;
 
 	xcors["purple"] = 0;
 	ycors["purple"] = 400;
+	speed["purple"] = 20;
 
 	xcors["truck"] = 0;
 	ycors["truck"] = 330;
+	speed["truck"] = 20;
 
 	xcors["yellow"] = 0;
 	ycors["yellow"] = 467;
+	speed["yellow"] = 20;
 
 	xcors["other_white"] = 0;
 	ycors["other_white"] = 431;
+	speed["other_white"] = 20;
 
 	xcors["log1"] = 250;
 	ycors["log1"] = 188;
@@ -90,6 +98,26 @@ function init_setup(){
 
 	drawBoard();
 	redraw();
+
+	setInterval(run,300);
+}
+
+function run(){
+	animate();
+	drawBoard();
+	redraw();
+}
+
+function animate(){
+
+	xcors["yellow"] = (speed["yellow"] + xcors["yellow"]) % 400;
+	xcors["white_car"] = speed["white_car"];
+	xcors["other_white"] += speed["other_white"];
+	xcors["truck"] = (speed["truck"] + xcors["truck"]) % 400;
+}
+
+function gameOver(){
+	return false;
 }
 
 function goForward(){
@@ -115,6 +143,35 @@ function goRight(){
 
 }
 
+function move(event){
+
+    console.log(event.keyCode);
+    switch(event.keyCode){
+    	case 37:
+    		event.preventDefault();
+    		xcors["frog"] -= frog_dist;
+    		break;
+
+    	case 38:
+    		event.preventDefault();
+    		goForward();
+    		//ycors["frog"] -= frog_dist;
+    		break;
+    	case 39:
+    		event.preventDefault();
+    		xcors["frog"] += frog_dist;
+    		break;
+    	case 40:
+    		event.preventDefault();
+    		//ycors["frog"] += frog_dist;
+    		goBackward();
+   		 	break;
+    }
+    drawBoard();
+    redraw();
+
+}
+
 function redraw(){
 	drawBoard();
 	forward_crouched_frog(xcors["frog"],ycors["frog"]);
@@ -128,8 +185,8 @@ function redraw(){
 	setText();
 	white_car(xcors["white_car"],ycors["white_car"]);
 	purp_car(xcors["purple"],ycors["purple"]);
-	truck(0,330);
-	yellow_car(0,467);
+	truck(400 - xcors["truck"],330);
+	yellow_car(xcors["yellow"],467);
 	other_white(0,431);
 	big_log(250,188);
 	big_log(50, 157);
