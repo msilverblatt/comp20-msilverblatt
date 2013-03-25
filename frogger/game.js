@@ -71,7 +71,7 @@ function init_setup(){
 
 	xcors["truck"] = 0;
 	ycors["truck"] = 330;
-	speed["truck"] = 20;
+	speed["truck"] = 1;
 
 	xcors["yellow"] = 0;
 	ycors["yellow"] = 467;
@@ -99,7 +99,7 @@ function init_setup(){
 	drawBoard();
 	redraw();
 
-	setInterval(run,300);
+	setInterval(run,30);
 }
 
 function run(){
@@ -185,7 +185,7 @@ function redraw(){
 	setText();
 	white_car(xcors["white_car"],ycors["white_car"]);
 	purp_car(xcors["purple"],ycors["purple"]);
-	truck(400 - xcors["truck"],330);
+	truck(360 - xcors["truck"],330);
 	yellow_car(xcors["yellow"],467);
 	other_white(0,431);
 	big_log(250,188);
