@@ -4,10 +4,19 @@ sprite.src = "assets/frogger_sprites.png";
 
 var lives = 5; 
 var xcors = [];
+xcors["white_car"] = [];
+xcors["other_white"] = [];
+xcors["truck"] = [];
+xcors["yellow"] = [];
+xcors["purple"] = [];
+xcors["log"] = [];
+
 var ycors = [];
+
+
 var speed = [];
 
-var frog_dist = 25;
+var frog_dist = 30;
 
 var steps = 0;
 var maxSteps = 0;
@@ -61,25 +70,29 @@ function init_setup(){
 	xcors["frog"] = canvas.width/2;
 	ycors["frog"] = 501;
 
-	xcors["white_car"] = 0;
+
+	xcors["white_car"][0] = 50;
+	xcors["white_car"][1] = 150;
+	xcors["white_car"][2] = 250;
+
 	ycors["white_car"] = 365;
-	speed["white_car"] = 20;
+	speed["white_car"] = 3;
 
 	xcors["purple"] = 0;
 	ycors["purple"] = 400;
-	speed["purple"] = 20;
+	speed["purple"] = 3;
 
 	xcors["truck"] = 0;
 	ycors["truck"] = 330;
-	speed["truck"] = 1;
+	speed["truck"] = 3;
 
 	xcors["yellow"] = 0;
 	ycors["yellow"] = 467;
-	speed["yellow"] = 20;
+	speed["yellow"] = 2;
 
 	xcors["other_white"] = 0;
 	ycors["other_white"] = 431;
-	speed["other_white"] = 20;
+	speed["other_white"] = 3;
 
 	xcors["log1"] = 250;
 	ycors["log1"] = 188;
@@ -99,7 +112,7 @@ function init_setup(){
 	drawBoard();
 	redraw();
 
-	setInterval(run,30);
+	setInterval(run,33);
 }
 
 function run(){
@@ -110,10 +123,14 @@ function run(){
 
 function animate(){
 
+	for (x = 0; x < 3; x++){
+		xcors["white_car"][x] = (speed["white_car"] + xcors["white_car"][x]) % 450;
+	}
 	xcors["yellow"] = (speed["yellow"] + xcors["yellow"]) % 400;
-	xcors["white_car"] = speed["white_car"];
-	xcors["other_white"] += speed["other_white"];
+//	xcors["white_car"] = (speed["white_car"] + xcors["white_car"]) % 400;
+	xcors["other_white"] = (speed["other_white"] + xcors["other_white"]) % 400;
 	xcors["truck"] = (speed["truck"] + xcors["truck"]) % 400;
+	xcors["purple"] = (speed["purple"] + xcors["purple"]) % 400;
 }
 
 function gameOver(){
@@ -183,11 +200,28 @@ function redraw(){
 	}
 	life_frog(lives);
 	setText();
-	white_car(xcors["white_car"],ycors["white_car"]);
-	purp_car(xcors["purple"],ycors["purple"]);
-	truck(360 - xcors["truck"],330);
-	yellow_car(xcors["yellow"],467);
-	other_white(0,431);
+
+	for (x = 0; x < 3; x++){
+		white_car(xcors["white_car"][x],ycors["white_car"]);
+		console.log(xcors["white_car"][x]);
+	}
+	//white_car(xcors["white_car"],ycors["white_car"]);
+	//white_car(((xcors["white_car"] + 100) % 400) - 10,ycors["white_car"]);
+	//white_car((xcors["white_car"] + 200) % 400, ycors["white_car"]);
+
+	purp_car(Math.abs(370-xcors["purple"]) % 400,ycors["purple"]);
+	purp_car((270-xcors["purple"]) % 400, ycors["purple"]);
+	purp_car(370-xcors["purple"],ycors["purple"]);
+
+	truck((350 - xcors["truck"]) % 400,330);
+	truck((150 - xcors["truck"]) % 400,330);
+	
+	yellow_car(370-xcors["yellow"],467);
+	
+	other_white(xcors["other_white"],431);
+	other_white((xcors["other_white"] + 100) % 400,431);
+	other_white((xcors["other_white"] + 200) % 400,431);
+
 	big_log(250,188);
 	big_log(50, 157);
 	med_log(200,126);
