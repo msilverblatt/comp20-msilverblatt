@@ -2,7 +2,7 @@
 sprite = new Image();
 sprite.src = "assets/frogger_sprites.png";
 
-var lives = 5; 
+var lives = 3; 
 var xcors = [];
 xcors["white_car"] = [];
 xcors["other_white"] = [];
@@ -16,7 +16,8 @@ var ycors = [];
 
 var speed = [];
 
-var frog_dist = 30;
+var frog_side_dist = 21;
+var frog_dist = 32;
 
 var steps = 0;
 var maxSteps = 0;
@@ -31,7 +32,7 @@ document.addEventListener("keydown", function(event) {
     	switch(event.keyCode){
     		case 37:
     			event.preventDefault();
-    			xcors["frog"] -= frog_dist;
+    			xcors["frog"] -= frog_side_dist;
     			break;
 
     		case 38:
@@ -41,7 +42,7 @@ document.addEventListener("keydown", function(event) {
     			break;
     		case 39:
     			event.preventDefault();
-    			xcors["frog"] += frog_dist;
+    			xcors["frog"] += frog_side_dist;
     			break;
     		case 40:
     			event.preventDefault();
@@ -49,9 +50,27 @@ document.addEventListener("keydown", function(event) {
     			goBackward();
    		 		break;
     	}
+
     	drawBoard();
     	redraw();
  	});
+
+function check_collisions(){
+	if((xcors["frog"] - xcors["white_car"][0]) < 20)
+	{
+		if ((ycors["frog"] - ycors["white_car"]) < 20)
+     	collide();
+	}	
+}
+
+function collide(){
+	xcors["frog"] = frog_start_x;
+	ycors["from"] = frog_start_y;
+	score = 0;
+	level--;
+	drawBoard();
+	redraw();
+}
 
 function init_setup(){
 	canvas = document.getElementById("game");
@@ -67,7 +86,7 @@ function init_setup(){
 //	lives = 3;
 
 
-	xcors["frog"] = canvas.width/2;
+	xcors["frog"] = canvas.width/2 - 12;
 	ycors["frog"] = 501;
 
 
@@ -117,6 +136,7 @@ function init_setup(){
 
 function run(){
 	animate();
+	check_collisions();
 	drawBoard();
 	redraw();
 }
@@ -245,7 +265,7 @@ function drawBoard(){
 	ctx.drawImage(sprite,0,54,399,53,0,58,400,53);
 	
 //  purple bars
-	ctx.drawImage(sprite,0,119,399,35,0,285,400,35);
+	ctx.drawImage(sprite,0,119,399,35,0,275,400,35);
 	ctx.drawImage(sprite,0,119,399,35,0,495,400,35);
 
 
