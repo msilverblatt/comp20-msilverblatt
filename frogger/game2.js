@@ -193,7 +193,7 @@ function detect_collisions(){
 		return;
 
 	}
-	else return;
+
 	for (var v in vehicles){
 		var m = vehicles[v];
 		var x = frog.xcor;
