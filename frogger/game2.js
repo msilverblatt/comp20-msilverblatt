@@ -12,6 +12,8 @@ var frog_up = 25;
 
 var frog_y = [500,467,432,397,362,327,280,245,215,188,157,126,85];
 
+var steps = 0;
+var maxsteps = 0;
  
 var vehicle_types = [];
 vehicle_types[0] = "yellow";
@@ -25,40 +27,36 @@ widths["small"] = 82;
 widths["med"] = 114;
 widths["long"] = 177;
 widths["yellow"] = 23;
-widths["white"] = 24;
+widths["white_car"] = 24;
 widths["other_white"] = 24;
 widths["truck"] = 47;
-widths["purple"] = 31;
+widths["purple"] = 30;
 
 var heights = []
 heights["small"] = 20;
 heights["med"] = 20;
 heights["long"] = 20;
 heights["yellow"] = 23;
-heights["white"] = 26;
+heights["white_car"] = 26;
 heights["other_white"] = 21;
 heights["truck"] = 18;
 heights["purple"] = 21;
 
 var speeds = [];
-speeds[0] = .5;
-speeds[1] = 1;
-speeds[2] = 2;
-speeds[3] = 3;
+
 
 var level = 1;
 var score = 0;
 var highscore = 0;
 var lives = 3;
 
-var fps = 33;
+var fps = 28;
 var interv;
 
 var onlog = false;
 var logid;
 
 document.addEventListener("keydown", function(event) {
-    	console.log(event.keyCode);
     	switch(event.keyCode){
     		case 37:
     			event.preventDefault();
@@ -85,6 +83,13 @@ function init_setup(){
 	ctx = canvas.getContext('2d');	
 	frog.xcor = canvas.width/2 - 12;
 	frog.ycor = 0;
+	lives = 3;
+	level = 1;
+	speeds[0] = .5;
+	speeds[1] = 1;
+	speeds[2] = 2;
+	speeds[3] = 3;
+	score = 0;
 	setLevel(level);
 	interv = setInterval(run,fps);
 }
@@ -95,7 +100,48 @@ function run(){
 	detect_collisions();
 }
 
+function win(){
+	console.log("WIN!");
+	steps = 0;
+	setTimeout(draw_board,100000);
+	clearInterval(interv);
+	
+	level++;
+	score += (100 * level);
+	setLevel(level);
+	inverv = setInterval(run, fps);
+}
+
 function detect_collisions(){
+	if (frog.ycor > 11){
+		if (frog.xcor < 5){
+			die();
+		}
+		else if (frog.xcor < 37){
+			win();
+		} else if (frog.xcor < 87){
+			die();
+		} else if (frog.xcor < 112){
+			win();
+		} else if (frog.xcor < 177){
+			die();
+		} else if (frog.xcor < 197){
+			win();
+		} else if (frog.xcor < 247){
+			die();
+		} else if (frog.xcor < 277){
+			win();
+		} else if (frog.xcor < 312){
+			die();
+		} else if (frog.xcor < 362){
+			win();
+		} else if (frog.xcor < 374){
+			die();
+		}
+		return;
+
+	}
+//	else return;
 	for (var v in vehicles){
 		var m = vehicles[v];
 		var x = frog.xcor;
@@ -104,8 +150,8 @@ function detect_collisions(){
 		var ydiff = y - m.ycor;
 		width = widths[m.type];
 		height = heights[m.type];
-		if (Math.abs(xdiff) < width){
-			if (Math.abs(ydiff) < height){
+		if ((xdiff < width) && (xdiff > -22)){
+			if (frog.ycor == m.ycor){
 				die();
 			}
 		}
@@ -120,7 +166,7 @@ function detect_collisions(){
 		var ydiff = y - m.ycor;
 		width = widths[m.type];
 		height = heights[m.type];
-		if (Math.abs(xdiff) < width){
+		if ((xdiff < width) && (xdiff > -21)){
 			if (Math.abs(ydiff) < height){
 				on = true;
 				if (!onlog){
@@ -140,33 +186,48 @@ function detect_collisions(){
 	} else {
 		onlog = false;
 	}
+	if ((frog.xcor < 0) || (frog.xcor > 379)) {
+		if (onlog) die();
+		else if (frog.xcor < 0) frog.xcor = 0;
+			else frog.xcor = 379;
+		}
 }
 
 function setLevel(level){
-	if (level == 1){
-		for (i = 0; i < 14; i++){
+	if (level > 0){
+		frog.ycor = 0;
+		frog.xcor = canvas.width/2 - 12;
+		for (i = 0; i < 15; i++){
 			vehicles[i] = {};
 			vehicles[i].speed = 2;
 			if ((Math.floor(i / 3) % 2) == 0){
 				vehicles[i].dir = "left";
-				vehicles[i].xcor = (405 + ((i % 3) * 75));
+				vehicles[i].xcor = (405 + ((i % 3) * 120)) - (i * 15);
 			} else {
 				vehicles[i].dir = "right";
-				vehicles[i].xcor = (-5 - ((i % 3) * 75));
+				vehicles[i].xcor = (i * 15) + (-5 - ((i % 3) * 120));
 			}
 			if (i > 11){
 				vehicles[i].speed = 1;
 			}
-			vehicles[i].ycor = 467 - (Math.floor(i / 3) *  35);
+			vehicles[i].ycor = (Math.floor(i / 3) + 1);
+//			vehicles[i].ycor = 467 - (Math.floor(i / 3) *  35);
 			vehicles[i].type = vehicle_types[Math.floor(i / 3)];
-			console.log(vehicles[i].type);
+		}
+		for (i = 15; i < 16; i++){
+			vehicles[i] = {};
+			vehicles[i].dir = "left";
+			vehicles[i].speed = 1;
+			vehicles[i].type = "truck";
+			vehicles[i].xcor = (900 + ((i % 3) * 120)) - (i * 15);
+			vehicles[i].ycor = 5;
 		}
 		for (i = 0; i < 4; i++){
 			logs[i] = {};
 			logs[i].type = "small";
 			logs[i].speed = 1;
 			logs[i].dir = "left";
-			logs[i].xcor = 5 + (i * 100);
+			logs[i].xcor = 5 + (i * 140);
 			logs[i].ycor = 126;
 
 		}
@@ -176,7 +237,7 @@ function setLevel(level){
 			logs[i].speed = 2;
 			logs[i].dir = "right";
 			logs[i].ycor = 157;
-			logs[i].xcor = 395 - ((i-4) * 125);
+			logs[i].xcor = 395 - ((i-4) * 180);
 
 		}
 		for (i = 8; i < 10; i++){
@@ -185,7 +246,7 @@ function setLevel(level){
 			logs[i].type = "long";
 			logs[i].dir = "left";
 			logs[i].ycor = 188;
-			logs[i].xcor = 5 + ((i - 8) * 200);
+			logs[i].xcor = 5 + ((i - 8) * 240);
 
 		}
 		for (i = 10; i < 14; i++){
@@ -194,7 +255,7 @@ function setLevel(level){
 			logs[i].type = "small";
 			logs[i].speed = 1;
 			logs[i].ycor = 215;
-			logs[i].xcor = 340 - ((i - 10) * 100);
+			logs[i].xcor = 340 - ((i - 10) * 150);
 
 		}
 		for (i = 14; i < 17; i++){
@@ -203,8 +264,13 @@ function setLevel(level){
 			logs[i].dir = "left";
 			logs[i].speed = 2;
 			logs[i].ycor = 245;
-			logs[i].xcor = 5 + ((i - 14) * 125);
+			logs[i].xcor = 5 + ((i - 14) * 190);
 
+		}
+	}
+	if (level != 1){
+		for (var s in speeds){
+			speeds[s] += .25;
 		}
 	}
 
@@ -214,9 +280,15 @@ function setLevel(level){
 
 function move_frog(dir){
 	if (dir == "forward"){
-		frog.ycor++;// -= frog_up;
+		frog.ycor++;
+		if (frog.ycor > steps){
+			steps++;
+			score += 10;
+		}
 	} else if (dir == "backward"){
-		frog.ycor--;// += frog_up;
+		if (frog.ycor > 0) {
+			frog.ycor--;
+		}
 	} else if (dir == "left"){
 		frog.xcor -= frog_side;
 	} else if (dir == "right"){
@@ -231,12 +303,12 @@ function animate(){
 		if (vehicles[v].dir == "left"){
 			vehicles[v].xcor -= speeds[vehicles[v].speed];
 			if (vehicles[v].xcor <= -200){
-				vehicles[v].xcor = 485;
+				vehicles[v].xcor = 445;
 			}
 		} else if (vehicles[v].dir == "right"){
 			vehicles[v].xcor += speeds[vehicles[v].speed];
 			if (vehicles[v].xcor > 500){
-				vehicles[v].xcor = -75;
+				vehicles[v].xcor = -45;
 			}
 		}
 	}
@@ -263,20 +335,24 @@ function animate(){
 }
 
 function die(){
-	clearInterval(interv);
+	steps = 0;
 	lives--;
 	if (lives == 0){
 		gameOver();
 	}
 	else {
-		setLevel(level);
+		setTimeout(draw,1000);
 		frog.xcor = canvas.width/2 - 10;
 		frog.ycor = 0;
-		interv = setInterval(run,fps);
 	}
 }
 
 function gameOver(){
+	clearInterval(interv);
+	ctx.font="60px Arial";
+	ctx.fillText("GAME OVER", 17, 200);
+	setTimeout(init_setup, 5000);
+
 
 }
 
@@ -315,7 +391,7 @@ function draw_board(){
 function draw_vehicles(){
 	for (var v in vehicles){
 		var m = vehicles[v];
-		draw_car(m.xcor,m.ycor,m.type);
+		draw_car(m.xcor,frog_y[m.ycor],m.type);
 	}
 }
 
