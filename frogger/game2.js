@@ -131,6 +131,7 @@ function win(){
 		score += 500;
 		setLevel(level);
 	}
+	wins = 0;
 	inverv = setInterval(run, fps);
 }
 
