@@ -1,0 +1,4 @@
+This repository was for Ming Chow's Comp 20 - Web Programming course during Spring '13 at Tufts University
+
+My favorite project was the frogger game. I was happy to finally learn JavaScript in some detail. It is also the work I am most proud of. I thought games were a lot more strenuous to make or would require flash, but the HTML5 canvas makes it quite easy. 
+I have come a long way through taking this course. I have been exposed to many new technologies such as some of the web frameworks we have looked at and javascript libraries. I feel significantly more confident in my web development abilities than I did at the beginning of the semester, and I am excited to spend the summer putting my new skills to use. 
