@@ -3,6 +3,7 @@
 <head>
 	<meta>
 	<link rel="stylesheet" href="styles.css">
+	<title>Security Report</title>
 </head>
 <body>
 	<script src="scripts.jss"></script>
@@ -23,7 +24,7 @@
 	
 	<div id="intro"></div>
 	<h2>Introduction</h2>
-	<p class="desc">Below is a detailed summary of the security vulnerabilities I found in bdell01&#39;s Scorecenter Application after a thorough assessment of both the live site and the source code.</p>
+	<p class="desc">Below is a summary of the security vulnerabilities I found in bdell01&#39;s Scorecenter Application after a thorough assessment of both the live site and the source code.</p>
 	<hr>
 	<div id="meth"></div>
 	<h2>Methodology</h2>
@@ -43,16 +44,29 @@
 	<div id="abs"></div>
 	<h2>Abstract</h2>
 	<p class="desc">
-		I found a number of vulnerabilities in this site. I was able to delete the entire database by manipulating the input sent to the server. Etc.
+		I discovered a few security vulnerabilities in this application. The biggest flaw is that the application will accept requests from anywhere without any authentication. This means anyone can report getting any score in any game, and it will be recorded and saved. This also means that requests are susceptible to script injection. Another glaring problem is that it will accept any input when adding data to the database. For example, I can pass a name as my score and gibberish (disallowed) symbols as the game_title, and it will get saved.
 	</p>
 	<hr>
 	<div class="iss"><div>
 	<h2>Issues Found</h2>
 	<ul>
 		<li>
+			<h4>No Input Validation</h4>
+			<h5>Location: all apis</h5>
+			<h5>Severity: <div class="high">High</div> - <div class="justify">Scripts can be inserted to input and executed</div></h5>
+			<h5>Description:</h5>
+			<p class="iss_desc">
+				By adding <code>&lt;SCRipt&gt;...&lt;scrIPT&gt;</code>, I believe I was able to execute scripts on the server. However, None of the scripts I tried running had any noticable result. I believe that I was successful in running them because nothing within the script tags is saved in the database. This is a potentially devastating flaw of this application, as someone with better scripting skills than myself would likely be able to read sensitive information, delete important information, or worse, insert malicious information.
+			</p>
+			<h5>Resolution:</h5>
+			<p class="iss_desc">
+				This issue could be solved fairly simply with regular expressions. I would pass each parameter through a series of regex's that would remove characters commonly found in code ("&lt;", "&gt;", ";", etc.)
+			</p>
+		</li>
+		<li>
 			<h4>No Authentication</h4>
 			<h5>Location: POST api</h5>
-			<h5>Severity: <div class="high">High</div> - <div class="justify">Anyone can add fake data</div></h5>
+			<h5>Severity: <div class="medium">Medium</div> - <div class="justify">Anyone can add fake data</div></h5>
 			<h5>Description:</h5>
 			<p class="iss_desc">
 				The API allows anyone who can send an HTTP request to add documents to the database. Presumably there is an inherent incentive to be at the top of the high scores list, so it is an extremely large problem if there is no validation of scores. Anyone, at this point, can submit a score for any game they choose. 
@@ -74,7 +88,7 @@
 		<li>
 			<h4>Does not require all parameters</h4>
 			<h5>Location: POST api</h5>
-			<h5>Severity: <div class="medium">Medium</div> - <div class="justify">Incomplete database entries could break API contracts.</div></h5>
+			<h5>Severity: <div class="low">Low</div> - <div class="justify">Incomplete database entries could break API contracts.</div></h5>
 			<h5>Description:</h5>
 			<p class="iss_desc">
 				The 'submit.json' POST function does not require that you give it all of the expected Parameters. This allows anyone to put an incomplete entry into the database of scores. 
@@ -91,7 +105,7 @@
 		<li>
 			<h4>Non-number values can be given as score</h4>
 			<h5>Location: POST api</h5>
-			<h5>Severity: <div class="medium">Medium</div> - <div class="justify">Operations on null values could cause the application to crash</div></h5>
+			<h5>Severity: <div class="low">Low</div> - <div class="justify">Operations on null values could cause the application to crash</div></h5>
 			<h5>Description:</h5>
 			<p class="iss_desc">
 				The application does not validate the score input as a numerical value. It calls <code>parseInt()</code> on the value, which prevents it from storing non numerical values. That does not report an error, however, if a non numeric digit is found, rather it sets the value in the document to null. A document lacking a score value could potentially crash the application if a function tries to sort scores by that value and operates on the null value.
@@ -107,7 +121,9 @@
 	<hr>
 	<div id="concl"></div>
 	<h2>Conclusion</h2>
-	<p class="desc">There are more issues than just the ones listed above. For example, the database blah...and the api blah...</p>
+	<p class="desc">
+		There are more issues than just the ones listed above, I am sure, but fixing those listed would be a good step towards a secure application. Most pressing of my concerns about the appliction is that input is never sanitized to preven execution of code. The other errors can still lead to significant problems with corrupt data in the database, but if a malicious user can execute his own code on the server absolutely nothing is safe. When the application is actually put into production, care must be taken to only allow requests from the games that are implementing the application, rather than the current universal "*".
+	</p>
 	<hr>
 </div>
 	</div>
