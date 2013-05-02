@@ -18,6 +18,7 @@
 	</div>
 
 	<div id="main">
+		<div id = "stuff">
 		<hr>
 	
 	<div id="intro"></div>
@@ -28,8 +29,14 @@
 	<h2>Methodology</h2>
 	<ul>
 		<li>
-			NAME OF TOOL
-			<p>I used tool x to find such and such type of vulnerability.</p>
+			Tamper Data
+			<p class="iss_desc">
+				My main tool for this project was the Tamper Data plugin for firefox, which allowed me to tweak POST requests to the server by either chaning values or adding new parameters
+			</p>
+		<li>
+			Paros
+			<p class="iss_desc">I ran a couple of scans of the application using Paros. It reported that Cross Site Scripting may be possible on this application. 
+			</p>
 		</li>
 	</ul>
 	<hr>
@@ -43,14 +50,58 @@
 	<h2>Issues Found</h2>
 	<ul>
 		<li>
-			<h4>ISSUE NAME</h4>
+			<h4>No Authentication</h4>
 			<h5>Location: POST api</h5>
-			<h5>Severity: <div class="high">High</div></h5>
-			<p class="justify">Allows user to delete entire database</p>
+			<h5>Severity: <div class="high">High</div> - <div class="justify">Anyone can add fake data</div></h5>
 			<h5>Description:</h5>
-			<p class="iss_desc">By inserting a mongo command...</p>
+			<p class="iss_desc">
+				The API allows anyone who can send an HTTP request to add documents to the database. Presumably there is an inherent incentive to be at the top of the high scores list, so it is an extremely large problem if there is no validation of scores. Anyone, at this point, can submit a score for any game they choose. 
+			</p>
+				<figure class = "image">
+					<img src="images/good_frogger.png">
+					<figcaption>So impressive.</figcaption>
+				</figure>
+			<p class = "iss_desc">
+				Additionally, low scores for users other than the malicious user can be posted falsely, which could lead to severe embarrassment.
+			</p>
+				<figure class="image">
+					<img src="images/ming_score.png">
+					<figcaption>How embarrassing!</figcaption>
+				</figure>
 			<h5>Resolution:</h5>
-			<p class="iss_res">By changing <code>app.post('/')...</code> to <code>app.post('/')...</code> I was able to...</p>
+			<p class="iss_desc">To solve this issue, we would need a list of legitimate games whose scores we are tracking, and where those games are hosted. Rather than having a line like <code>response.header("Access-Control-Allow-Origin", "*");</code>, which allows requests to come from anywhere, we must 'whitelist' servers and ports from which we trust requests to post scores.</p>
+		</li>
+		<li>
+			<h4>Does not require all parameters</h4>
+			<h5>Location: POST api</h5>
+			<h5>Severity: <div class="medium">Medium</div> - <div class="justify">Incomplete database entries could break API contracts.</div></h5>
+			<h5>Description:</h5>
+			<p class="iss_desc">
+				The 'submit.json' POST function does not require that you give it all of the expected Parameters. This allows anyone to put an incomplete entry into the database of scores. 
+			</p>
+			<figure class="image">
+				<img src="images/no_user.png">
+				<figcaption>A request sent without the expected parameters is still executed</figcaption>
+			</figure>
+			<h5>Resolution:</h5>
+			<p class= "iss_desc">
+				Before calling <code>collection.insert(...)</code> we need to check if the values for username, game_title, and high_score are null. If they are, do not add anyting to the database and send an appropriate response to the user.
+			</p>
+		</li>
+		<li>
+			<h4>Non-number values can be given as score</h4>
+			<h5>Location: POST api</h5>
+			<h5>Severity: <div class="medium">Medium</div> - <div class="justify">Operations on null values could cause the application to crash</div></h5>
+			<h5>Description:</h5>
+			<p class="iss_desc">
+				The application does not validate the score input as a numerical value. It calls <code>parseInt()</code> on the value, which prevents it from storing non numerical values. That does not report an error, however, if a non numeric digit is found, rather it sets the value in the document to null. A document lacking a score value could potentially crash the application if a function tries to sort scores by that value and operates on the null value.
+			</p>
+			<figure class="image">
+				<img src="images/not_number.png">
+				<figcaption>Non-numerical values for the score parameter are stored as null in the database</figcaption>
+			</figure>
+			<h5>Resolution:</h5>
+			<p class="iss_desc">This issue can be resolved by checking if the parameters is null again after the <code>parseInt()</code> call, or by utilizing the JavaScript function <code>isNaN()</code> before continuing.</p>
 		</li>
 	</ul>
 	<hr>
@@ -58,5 +109,6 @@
 	<h2>Conclusion</h2>
 	<p class="desc">There are more issues than just the ones listed above. For example, the database blah...and the api blah...</p>
 	<hr>
+</div>
 	</div>
 </body>
