@@ -1,0 +1,8 @@
+Comp 20 - Web Programming
+Assignment 6 - Security Assessment of ScoreCenter
+Michael Silverblatt
+
+I was able to discover some security vulnerabilities in the application. However, most were related to invalidating the data that is actually stored in the database, rather than actually affecting the functioning of the program. I was able to insert scripts to parameters, but could not achieve any tangible results using payloads.
+
+I collaborated with my partner, Beckylee Dell, on this assignment. We exchanged source code and links to our heroku websites and had a discussion about the working/missing functionality of our applications, and shared any other information we felt was relevant for completing this assignment.
+
